@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="Company Maker — turn your idea into a brief, roadmap, and co-founder match plan. Free, no login." />
+  <meta name="theme-color" content="#1a0f0a" />
+  <title>Company Maker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #1a0f0a;
+      --bg-elevated: #241610;
+      --bg-card: #2c1c14;
+      --bg-input: #1f1410;
+      --border: rgba(255, 214, 170, 0.12);
+      --border-strong: rgba(255, 214, 170, 0.22);
+      --text: #f7efe6;
+      --text-muted: #c4b0a0;
+      --text-dim: #8f7a6c;
+      --accent: #e8a87c;
+      --accent-hot: #f0b27a;
+      --accent-soft: rgba(232, 168, 124, 0.15);
+      --accent-glow: rgba(232, 168, 124, 0.35);
+      --success: #8fbc8f;
+      --user-bubble: #3d2a1f;
+      --bot-bubble: #2a1d16;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      --font: "DM Sans", system-ui, sans-serif;
+      --display: "Fraunces", Georgia, serif;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+    }
+
+    body {
+      background:
+        radial-gradient(ellipse 80% 50% at 20% -10%, rgba(232, 168, 124, 0.18), transparent 50%),
+        radial-gradient(ellipse 60% 40% at 90% 10%, rgba(180, 100, 60, 0.12), transparent 45%),
+        var(--bg);
+      min-height: 100dvh;
+    }
+
+    .app {
+      max-width: 720px;
+      margin: 0 auto;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding: 0 16px;
+    }
+
+    /* —— Landing —— */
+    .landing {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 48px 0 64px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-soft);
+      border: 1px solid var(--border-strong);
+      color: var(--accent-hot);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      padding: 6px 12px;
+      border-radius: 999px;
+      margin-bottom: 20px;
+      width: fit-content;
+    }
+
+    .badge::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-size: clamp(2.4rem, 8vw, 3.4rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #fff8f0 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .tagline {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 34em;
+      margin-bottom: 32px;
+    }
+
+    .features {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+
+    .feature {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      transition: border-color 0.2s;
+    }
+
+    .feature:hover { border-color: var(--border-strong); }
+
+    .feature-icon {
+      font-size: 1.4rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .feature strong {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .feature span {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn {
+      appearance: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 999px;
+      padding: 14px 28px;
+      transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-hot), #d4895a);
+      color: #1a0f0a;
+      box-shadow: 0 4px 24px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 6px 32px var(--accent-glow);
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border-strong);
+      padding: 13px 22px;
+    }
+
+    .btn-ghost:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .fine-print {
+      margin-top: 20px;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    /* —— Chat shell —— */
+    .chat-shell {
+      display: none;
+      flex-direction: column;
+      height: 100dvh;
+      max-height: 100dvh;
+      padding-bottom: var(--safe-bottom);
+    }
+
+    .chat-shell.active { display: flex; }
+    .landing.hidden { display: none; }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0 12px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--display);
+      font-weight: 600;
+      font-size: 1.15rem;
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), #b86b3c);
+      display: grid;
+      place-items: center;
+      font-size: 0.9rem;
+      box-shadow: 0 2px 12px var(--accent-glow);
+    }
+
+    .progress-wrap {
+      flex: 1;
+      max-width: 180px;
+    }
+
+    .progress-label {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+      text-align: right;
+    }
+
+    .progress-bar {
+      height: 4px;
+      background: var(--bg-input);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-hot));
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 0 12px;
+      scroll-behavior: smooth;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .msg {
+      max-width: 92%;
+      animation: fadeUp 0.35s ease both;
+    }
+
+    .msg.bot { align-self: flex-start; }
+    .msg.user { align-self: flex-end; }
+
+    .bubble {
+      padding: 14px 16px;
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    .msg.bot .bubble {
+      background: var(--bot-bubble);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+
+    .msg.user .bubble {
+      background: var(--user-bubble);
+      border: 1px solid var(--border-strong);
+      border-bottom-right-radius: 4px;
+      color: var(--text);
+    }
+
+    .bubble h3 {
+      font-family: var(--display);
+      font-size: 1.15rem;
+      margin: 4px 0 10px;
+      color: var(--accent-hot);
+    }
+
+    .bubble h4 {
+      font-size: 0.95rem;
+      margin: 14px 0 6px;
+      color: var(--accent);
+    }
+
+    .bubble p + p { margin-top: 8px; }
+
+    .bubble ul, .bubble ol {
+      margin: 8px 0 8px 1.2em;
+      color: var(--text-muted);
+    }
+
+    .bubble li { margin: 4px 0; }
+
+    .bubble strong { color: var(--text); font-weight: 600; }
+
+    .card-block {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      margin: 10px 0;
+    }
+
+    .card-block .label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+
+    .archetype {
+      border-left: 3px solid var(--accent);
+      padding-left: 12px;
+      margin: 10px 0;
+    }
+
+    .archetype .ex-label {
+      font-size: 0.7rem;
+      color: var(--accent);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .script-box {
+      background: var(--bg-input);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-top: 8px;
+      white-space: pre-wrap;
+    }
+
+    .typing {
+      display: flex;
+      gap: 5px;
+      padding: 14px 18px;
+      width: fit-content;
+    }
+
+    .typing span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-dim);
+      animation: bounce 1.2s infinite ease-in-out;
+    }
+
+    .typing span:nth-child(2) { animation-delay: 0.15s; }
+    .typing span:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+      40% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* —— Composer —— */
+    .composer {
+      flex-shrink: 0;
+      padding: 10px 0 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .choices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .choice {
+      appearance: none;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-card);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 10px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    }
+
+    .choice:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .choice:active { transform: scale(0.97); }
+
+    .choice.selected {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent-hot);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .text-input {
+      flex: 1;
+      background: var(--bg-input);
+      border: 1px solid var(--border-strong);
+      border-radius: 22px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      padding: 12px 18px;
+      outline: none;
+      resize: none;
+      min-height: 46px;
+      max-height: 120px;
+      line-height: 1.4;
+    }
+
+    .text-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .text-input::placeholder { color: var(--text-dim); }
+
+    .send-btn {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, var(--accent-hot), #d4895a);
+      color: #1a0f0a;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+
+    .send-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .send-btn:not(:disabled):hover { transform: scale(1.05); }
+
+    .send-btn svg { width: 20px; height: 20px; }
+
+    .skip-link {
+      display: block;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-top: 8px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      width: 100%;
+      padding: 4px;
+    }
+
+    .skip-link:hover { color: var(--text-muted); }
+
+    .restart-btn {
+      appearance: none;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-family: inherit;
+      font-size: 0.75rem;
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .restart-btn:hover { color: var(--text); border-color: var(--border-strong); }
+
+    .phase-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--accent-soft);
+      color: var(--accent-hot);
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+    }
+
+    footer.site-foot {
+      text-align: center;
+      padding: 24px 0 40px;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .landing footer.site-foot { padding-top: 48px; }
+
+    @media (max-width: 480px) {
+      .progress-wrap { display: none; }
+      .msg { max-width: 96%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Landing -->
+    <section class="landing" id="landing">
+      <div class="badge">Free · No login · Instant</div>
+      <h1>Company Maker</h1>
+      <p class="tagline">
+        Turn a rough idea into a clear company brief, a practical roadmap, and a co-founder match plan — in one conversation. Built for founders who want momentum, not another blank doc.
+      </p>
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">🧭</div>
+          <div>
+            <strong>Guided intake</strong>
+            <span>Company kind, stage, strengths, gaps — answered in minutes.</span>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">📋</div>
+          <div>
+            <strong>Brief + roadmap</strong>
+            <span>A Company Brief and multi-phase plan with this-week actions.</span>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🤝</div>
+          <div>
+            <strong>Co-founder matching</strong>
+            <span>Ideal profiles, example archetypes, and outreach scripts.</span>
+          </div>
+        </div>
+      </div>
+      <div class="cta-row">
+        <button class="btn btn-primary" id="startBtn" type="button">Start building →</button>
+        <button class="btn btn-ghost" id="howBtn" type="button">How it works</button>
+      </div>
+      <p class="fine-print">Runs entirely in your browser. Nothing is uploaded. Raise goals and financial rails are conceptual only.</p>
+      <footer class="site-foot">Company Maker · Made for founders who ship</footer>
+    </section>
+
+    <!-- Chat -->
+    <section class="chat-shell" id="chatShell" aria-label="Company Maker conversation">
+      <header class="chat-header">
+        <div class="brand">
+          <div class="brand-mark">✦</div>
+          <span>Company Maker</span>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-label" id="progressLabel">Step 1 of 5</div>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+        <button class="restart-btn" id="restartBtn" type="button" title="Start over">Restart</button>
+      </header>
+      <div class="messages" id="messages" role="log" aria-live="polite"></div>
+      <div class="composer" id="composer">
+        <div class="choices" id="choices"></div>
+        <div class="input-row">
+          <textarea class="text-input" id="textInput" rows="1" placeholder="Type your answer…" disabled></textarea>
+          <button class="send-btn" id="sendBtn" type="button" disabled aria-label="Send">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+        <button class="skip-link" id="skipBtn" type="button" hidden>Skip this one</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+(function () {
+  "use strict";
+
+  const state = {
+    kind: "",
+    kindLabel: "",
+    stage: "",
+    stageLabel: "",
+    strengths: "",
+    gaps: "",
+    raise: "",
+    step: 0,
+  };
+
+  const STEPS = 5; // kind, stage, strengths, gaps, raise (+ then generate)
+
+  const KIND_OPTIONS = [
+    { id: "saas", label: "SaaS / software" },
+    { id: "marketplace", label: "Marketplace" },
+    { id: "consumer", label: "Consumer app / product" },
+    { id: "services", label: "Services / agency" },
+    { id: "hardware", label: "Hardware / physical" },
+    { id: "other", label: "Something else" },
+  ];
+
+  const STAGE_OPTIONS = [
+    { id: "idea", label: "Just an idea" },
+    { id: "validation", label: "Talking to users" },
+    { id: "mvp", label: "Building / MVP" },
+    { id: "early", label: "Early traction" },
+    { id: "growth", label: "Growing & hiring" },
+  ];
+
+  const STRENGTH_CHIPS = [
+    "Product / building",
+    "Sales & GTM",
+    "Design / UX",
+    "Domain expertise",
+    "Ops & execution",
+    "Fundraising story",
+    "Community / content",
+  ];
+
+  const GAP_CHIPS = [
+    "Technical co-founder",
+    "Sales / BD",
+    "Product design",
+    "Marketing / growth",
+    "Ops / finance",
+    "Industry network",
+  ];
+
+  const RAISE_OPTIONS = [
+    { id: "boot", label: "Bootstrapping — no raise planned" },
+    { id: "friends", label: "Friends & family (conceptual)" },
+    { id: "preseed", label: "Pre-seed (conceptual)" },
+    { id: "seed", label: "Seed (conceptual)" },
+    { id: "later", label: "Not sure / later" },
+  ];
+
+  const el = {
+    landing: document.getElementById("landing"),
+    chatShell: document.getElementById("chatShell"),
+    messages: document.getElementById("messages"),
+    choices: document.getElementById("choices"),
+    textInput: document.getElementById("textInput"),
+    sendBtn: document.getElementById("sendBtn"),
+    skipBtn: document.getElementById("skipBtn"),
+    progressFill: document.getElementById("progressFill"),
+    progressLabel: document.getElementById("progressLabel"),
+    startBtn: document.getElementById("startBtn"),
+    howBtn: document.getElementById("howBtn"),
+    restartBtn: document.getElementById("restartBtn"),
+  };
+
+  let awaiting = null; // { type, multi?, allowText?, skippable? }
+  let selectedChips = new Set();
+
+  function setProgress(step) {
+    state.step = step;
+    const pct = Math.min(100, Math.round((step / STEPS) * 100));
+    el.progressFill.style.width = pct + "%";
+    el.progressLabel.textContent = step >= STEPS ? "Generating…" : `Step ${Math.min(step + 1, STEPS)} of ${STEPS}`;
+  }
+
+  function scrollBottom() {
+    requestAnimationFrame(() => {
+      el.messages.scrollTop = el.messages.scrollHeight;
+    });
+  }
+
+  function addBot(html, delay) {
+    return new Promise((resolve) => {
+      const typing = document.createElement("div");
+      typing.className = "msg bot";
+      typing.innerHTML = '<div class="bubble typing"><span></span><span></span><span></span></div>';
+      el.messages.appendChild(typing);
+      scrollBottom();
+      setTimeout(() => {
+        typing.remove();
+        const msg = document.createElement("div");
+        msg.className = "msg bot";
+        msg.innerHTML = `<div class="bubble">${html}</div>`;
+        el.messages.appendChild(msg);
+        scrollBottom();
+        resolve();
+      }, delay == null ? 550 : delay);
+    });
+  }
+
+  function addUser(text) {
+    const msg = document.createElement("div");
+    msg.className = "msg user";
+    msg.innerHTML = `<div class="bubble">${escapeHtml(text)}</div>`;
+    el.messages.appendChild(msg);
+    scrollBottom();
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function clearComposer() {
+    el.choices.innerHTML = "";
+    el.textInput.value = "";
+    el.textInput.disabled = true;
+    el.sendBtn.disabled = true;
+    el.skipBtn.hidden = true;
+    selectedChips = new Set();
+    awaiting = null;
+  }
+
+  function showChoices(options, opts) {
+    opts = opts || {};
+    awaiting = { type: "choice", multi: !!opts.multi, allowText: !!opts.allowText, skippable: !!opts.skippable, options };
+    el.choices.innerHTML = "";
+    options.forEach((o) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "choice";
+      btn.textContent = o.label;
+      btn.dataset.id = o.id;
+      btn.addEventListener("click", () => onChoiceClick(o, btn));
+      el.choices.appendChild(btn);
+    });
+    if (opts.multi) {
+      const done = document.createElement("button");
+      done.type = "button";
+      done.className = "choice";
+      done.style.borderColor = "var(--accent)";
+      done.style.color = "var(--accent-hot)";
+      done.textContent = "Continue →";
+      done.addEventListener("click", () => submitMulti());
+      el.choices.appendChild(done);
+    }
+    el.textInput.disabled = !opts.allowText && !opts.multi;
+    if (opts.allowText || opts.multi) {
+      el.textInput.disabled = false;
+      el.textInput.placeholder = opts.multi
+        ? "Or type extras, then Continue…"
+        : "Or type your own…";
+      el.sendBtn.disabled = false;
+      el.textInput.focus();
+    }
+    el.skipBtn.hidden = !opts.skippable;
+  }
+
+  function onChoiceClick(option, btn) {
+    if (!awaiting) return;
+    if (awaiting.multi) {
+      if (selectedChips.has(option.label)) {
+        selectedChips.delete(option.label);
+        btn.classList.remove("selected");
+      } else {
+        selectedChips.add(option.label);
+        btn.classList.add("selected");
+      }
+      return;
+    }
+    clearComposer();
+    addUser(option.label);
+    handleAnswer(option);
+  }
+
+  function submitMulti() {
+    if (!awaiting || !awaiting.multi) return;
+    const extra = el.textInput.value.trim();
+    const parts = [...selectedChips];
+    if (extra) parts.push(extra);
+    if (!parts.length) return;
+    const text = parts.join(", ");
+    clearComposer();
+    addUser(text);
+    handleAnswer({ id: "multi", label: text, value: text });
+  }
+
+  function showTextOnly(opts) {
+    opts = opts || {};
+    awaiting = { type: "text", skippable: !!opts.skippable };
+    el.choices.innerHTML = "";
+    el.textInput.disabled = false;
+    el.sendBtn.disabled = false;
+    el.textInput.placeholder = opts.placeholder || "Type your answer…";
+    el.skipBtn.hidden = !opts.skippable;
+    el.textInput.focus();
+  }
+
+  function submitText() {
+    if (!awaiting) return;
+    const text = el.textInput.value.trim();
+    if (!text && awaiting.type === "text" && !awaiting.skippable) return;
+    if (awaiting.multi) {
+      submitMulti();
+      return;
+    }
+    if (awaiting.type === "choice" && awaiting.allowText && text) {
+      clearComposer();
+      addUser(text);
+      handleAnswer({ id: "custom", label: text });
+      return;
+    }
+    if (awaiting.type === "text") {
+      const t = text || "(skipped)";
+      clearComposer();
+      addUser(text ? text : "Skipped");
+      handleAnswer({ id: "text", label: text ? text : "", value: text });
+    }
+  }
+
+  el.sendBtn.addEventListener("click", submitText);
+  el.textInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      submitText();
+    }
+  });
+  el.textInput.addEventListener("input", () => {
+    el.textInput.style.height = "auto";
+    el.textInput.style.height = Math.min(120, el.textInput.scrollHeight) + "px";
+  });
+
+  el.skipBtn.addEventListener("click", () => {
+    if (!awaiting || !awaiting.skippable) return;
+    clearComposer();
+    addUser("Skipped");
+    handleAnswer({ id: "skip", label: "", value: "" });
+  });
+
+  // —— Flow ——
+  async function startChat() {
+    el.landing.classList.add("hidden");
+    el.chatShell.classList.add("active");
+    el.messages.innerHTML = "";
+    Object.assign(state, { kind: "", kindLabel: "", stage: "", stageLabel: "", strengths: "", gaps: "", raise: "", step: 0 });
+    clearComposer();
+    setProgress(0);
+    await addBot("Hey founder 👋 I'm <strong>Company Maker</strong>. In a few quick questions we'll draft your Company Brief, a roadmap with this-week actions, and a co-founder match plan.<br><br>No login. No fluff. Ready when you are.");
+    await askKind();
+  }
+
+  async function askKind() {
+    setProgress(0);
+    await addBot("First up — <strong>what kind of company</strong> are you building?");
+    showChoices(KIND_OPTIONS, { allowText: true });
+  }
+
+  async function askStage() {
+    setProgress(1);
+    await addBot("Where are you <strong>right now</strong>?");
+    showChoices(STAGE_OPTIONS);
+  }
+
+  async function askStrengths() {
+    setProgress(2);
+    await addBot("What are <strong>your strengths</strong> as a founder? Pick a few (or type your own).");
+    showChoices(STRENGTH_CHIPS.map((l) => ({ id: l, label: l })), { multi: true, allowText: true });
+  }
+
+  async function askGaps() {
+    setProgress(3);
+    await addBot("Where do you feel the biggest <strong>gaps</strong>? This drives co-founder matching.");
+    showChoices(GAP_CHIPS.map((l) => ({ id: l, label: l })), { multi: true, allowText: true });
+  }
+
+  async function askRaise() {
+    setProgress(4);
+    await addBot("Optional — any <strong>raise goal</strong> in mind? (Conceptual only — we don't handle money or commissions.)");
+    showChoices(RAISE_OPTIONS, { skippable: true });
+  }
+
+  function handleAnswer(option) {
+    const step = state.step;
+    if (step === 0) {
+      state.kind = option.id === "custom" ? "other" : option.id;
+      state.kindLabel = option.label;
+      askStage();
+    } else if (step === 1) {
+      state.stage = option.id;
+      state.stageLabel = option.label;
+      askStrengths();
+    } else if (step === 2) {
+      state.strengths = option.value || option.label;
+      askGaps();
+    } else if (step === 3) {
+      state.gaps = option.value || option.label;
+      askRaise();
+    } else if (step === 4) {
+      state.raise = option.label || "Not specified";
+      generateAll();
+    }
+  }
+
+  async function generateAll() {
+    setProgress(5);
+    clearComposer();
+    await addBot("Got it. Brewing your brief, roadmap, and co-founder plan…", 700);
+    await addBot(buildBriefHtml(), 800);
+    await addBot(buildRoadmapHtml(), 900);
+    await addBot(buildMatchingHtml(), 1000);
+    await addBot(
+      "That's your Company Maker pack ✨<br><br>" +
+      "<strong>Next moves:</strong> pick one this-week action, reach out to one archetype with the script, and revisit when your stage shifts.<br><br>" +
+      "<em>Note:</em> fundraising and any commission-style rails stay conceptual here — this app never processes payments or deals.",
+      500
+    );
+    el.progressLabel.textContent = "Complete";
+    el.choices.innerHTML = "";
+    const again = document.createElement("button");
+    again.type = "button";
+    again.className = "choice";
+    again.textContent = "Start a new company →";
+    again.addEventListener("click", () => startChat());
+    el.choices.appendChild(again);
+    const copyBtn = document.createElement("button");
+    copyBtn.type = "button";
+    copyBtn.className = "choice";
+    copyBtn.textContent = "Copy summary";
+    copyBtn.addEventListener("click", () => {
+      const text = buildPlainSummary();
+      navigator.clipboard.writeText(text).then(() => {
+        copyBtn.textContent = "Copied!";
+        setTimeout(() => (copyBtn.textContent = "Copy summary"), 1500);
+      }).catch(() => {
+        copyBtn.textContent = "Select & copy manually";
+      });
+    });
+    el.choices.appendChild(copyBtn);
+  }
+
+  function primaryGap() {
+    const g = (state.gaps || "").toLowerCase();
+    if (g.includes("technical") || g.includes("tech")) return "technical";
+    if (g.includes("sales") || g.includes("bd")) return "sales";
+    if (g.includes("design") || g.includes("product design")) return "design";
+    if (g.includes("marketing") || g.includes("growth")) return "growth";
+    if (g.includes("ops") || g.includes("finance")) return "ops";
+    if (g.includes("network") || g.includes("industry")) return "network";
+    return "general";
+  }
+
+  function kindInsight() {
+    const map = {
+      saas: "B2B software that solves a painful, recurring job — lean toward clear ICP, product-led or sales-assisted motion, and retention before vanity acquisition.",
+      marketplace: "Two-sided liquidity is the game. Nail one niche geography or vertical before expanding; supply quality beats supply quantity early.",
+      consumer: "Habit and retention trump features. Obsess over the first-session aha and a loop people return to without ads.",
+      services: "Productize what you already deliver well. Document delivery, raise prices with proof, then decide what to turn into software later.",
+      hardware: "Prototype ruthlessly, protect unit economics, and validate demand before tooling. Partners and ops matter as much as the gadget.",
+      other: "Clarity of who you serve and why they pay beats category labels. Stay concrete on the problem and the wedge.",
+    };
+    return map[state.kind] || map.other;
+  }
+
+  function stageFocus() {
+    const map = {
+      idea: "Validate the problem with real conversations before you build much.",
+      validation: "Synthesize interview notes into a sharp ICP and a wedge offer.",
+      mvp: "Ship a thin slice that delivers the core outcome; measure activation.",
+      early: "Double down on what converts; kill distractions; hire for the bottleneck.",
+      growth: "Systematize GTM and culture; protect focus as the team grows.",
+    };
+    return map[state.stage] || map.idea;
+  }
+
+  function buildBriefHtml() {
+    return `
+      <h3>Company Brief</h3>
+      <div class="card-block">
+        <div class="label">Working name</div>
+        <strong>${escapeHtml(deriveName())}</strong>
+      </div>
+      <div class="card-block">
+        <div class="label">One-liner</div>
+        ${escapeHtml(oneLiner())}
+      </div>
+      <p><strong>Kind:</strong> ${escapeHtml(state.kindLabel)} · <strong>Stage:</strong> ${escapeHtml(state.stageLabel)}</p>
+      <h4>Thesis</h4>
+      <p>${escapeHtml(kindInsight())}</p>
+      <h4>Founder edge</h4>
+      <p>You're bringing: <strong>${escapeHtml(state.strengths || "general founder grit")}</strong>.</p>
+      <h4>Priority gaps</h4>
+      <p>${escapeHtml(state.gaps || "Not specified — we'll keep matching flexible.")}</p>
+      <h4>Raise stance (conceptual)</h4>
+      <p>${escapeHtml(state.raise || "Not specified")}. Treat capital as a tool after the wedge is clear — not a substitute for learning.</p>
+      <h4>Near-term focus</h4>
+      <p>${escapeHtml(stageFocus())}</p>
+    `;
+  }
+
+  function deriveName() {
+    const kind = state.kindLabel.split(/[\/–—]/)[0].trim();
+    const stageHint = state.stage === "idea" ? "Studio" : state.stage === "mvp" ? "Labs" : "Co";
+    return `${kind} ${stageHint} (working title)`;
+  }
+
+  function oneLiner() {
+    return `A ${state.kindLabel.toLowerCase()} for people who need a clearer path from ${state.stageLabel.toLowerCase()} to a company that compounds — led by a founder strong in ${firstStrength()} and currently seeking help with ${firstGap()}.`;
+  }
+
+  function firstStrength() {
+    const s = (state.strengths || "execution").split(",")[0].trim().toLowerCase();
+    return s || "execution";
+  }
+
+  function firstGap() {
+    const g = (state.gaps || "complementary skills").split(",")[0].trim().toLowerCase();
+    return g || "complementary skills";
+  }
+
+  function buildRoadmapHtml() {
+    const phases = roadmapPhases();
+    let html = `<h3>Roadmap</h3><p>Phased so you always know what “good” looks like this week.</p>`;
+    phases.forEach((p, i) => {
+      html += `
+        <div class="card-block">
+          <span class="phase-tag">Phase ${i + 1} · ${escapeHtml(p.time)}</span>
+          <strong>${escapeHtml(p.title)}</strong>
+          <ul>${p.actions.map((a) => `<li>${escapeHtml(a)}</li>`).join("")}</ul>
+        </div>`;
+    });
+    html += `
+      <h4>This week</h4>
+      <ul>
+        ${thisWeekActions().map((a) => `<li><strong>${escapeHtml(a)}</strong></li>`).join("")}
+      </ul>`;
+    return html;
+  }
+
+  function roadmapPhases() {
+    const gap = primaryGap();
+    const base = [
+      {
+        time: "Weeks 1–2",
+        title: "Clarify & commit",
+        actions: [
+          "Write a one-page problem statement and ICP hypothesis.",
+          "List 20 people who feel the pain; book 5 conversations.",
+          "Decide your wedge: one segment, one outcome, one channel.",
+        ],
+      },
+      {
+        time: "Weeks 3–6",
+        title: "Prove the wedge",
+        actions: [
+          state.stage === "idea" || state.stage === "validation"
+            ? "Run a no/low-code smoke test or concierge offer."
+            : "Ship the thinnest MVP slice that delivers the core outcome.",
+          "Define one activation metric and check it weekly.",
+          "Document what you learned; kill one idea that didn't stick.",
+        ],
+      },
+      {
+        time: "Months 2–3",
+        title: "Build the engine",
+        actions: [
+          "Systematize the channel that worked (even if it's manual).",
+          gapHint(gap),
+          "Revisit raise stance only after you can show learning velocity.",
+        ],
+      },
+      {
+        time: "Ongoing",
+        title: "Compound",
+        actions: [
+          "Hire or partner for the #1 bottleneck — not a wishlist.",
+          "Keep a simple operating cadence: weekly goals, monthly review.",
+          "Protect founder energy; say no to shiny side quests.",
+        ],
+      },
+    ];
+    return base;
+  }
+
+  function gapHint(gap) {
+    const map = {
+      technical: "Pair with a builder (or contractor) to harden the core product path.",
+      sales: "Design a repeatable discovery → demo → close script; do 10 live reps.",
+      design: "Audit onboarding UX; remove one friction point that kills aha.",
+      growth: "Pick one owned channel (content, community, or partnerships) and ship weekly.",
+      ops: "Set basic financial hygiene and delivery SOPs so you can scale without chaos.",
+      network: "Map 30 warm intros in your industry; ask for advice, not favors.",
+      general: "Recruit complementary help for your top gap before expanding scope.",
+    };
+    return map[gap] || map.general;
+  }
+
+  function thisWeekActions() {
+    const gap = primaryGap();
+    return [
+      "Book 3 customer conversations (or user tests) this week.",
+      "Draft your one-liner and share it with two trusted peers for a gut check.",
+      gap === "technical"
+        ? "Outline the MVP build list and identify who can build the riskiest piece."
+        : gap === "sales"
+        ? "Write a 5-email / LinkedIn outreach sequence and send 10 personal notes."
+        : "Spend 90 minutes on your #1 gap — then decide: learn it, hire it, or partner.",
+    ];
+  }
+
+  function buildMatchingHtml() {
+    const gap = primaryGap();
+    const profiles = idealProfiles(gap);
+    const archetypes = exampleArchetypes(gap);
+    let html = `
+      <h3>Co-founder matching</h3>
+      <p>Priority gap: <strong>${escapeHtml(firstGap())}</strong>. Below: ideal profile traits, <em>example</em> archetypes (not real people), and a ready outreach script.</p>
+      <h4>Ideal profile</h4>
+      <ul>${profiles.map((p) => `<li>${escapeHtml(p)}</li>`).join("")}</ul>
+      <h4>Example archetypes</h4>
+      <p style="font-size:0.85rem;color:var(--text-dim)">Labeled as examples only — no real emails or URLs invented.</p>
+    `;
+    archetypes.forEach((a, i) => {
+      html += `
+        <div class="archetype">
+          <div class="ex-label">Example ${i + 1}</div>
+          <strong>${escapeHtml(a.title)}</strong>
+          <p style="color:var(--text-muted);font-size:0.9rem;margin-top:4px">${escapeHtml(a.blurb)}</p>
+          <p style="font-size:0.85rem;margin-top:6px"><strong>Where to look:</strong> ${escapeHtml(a.where)}</p>
+        </div>`;
+    });
+    html += `
+      <h4>Outreach script</h4>
+      <div class="script-box">${escapeHtml(outreachScript(gap))}</div>
+      <p style="margin-top:10px;font-size:0.85rem;color:var(--text-dim)">Personalize the first line. Ask for a 20-minute chat, not a commitment.</p>
+    `;
+    return html;
+  }
+
+  function idealProfiles(gap) {
+    const common = [
+      "Complementary skills to yours (not a clone).",
+      "Evidence they've shipped or sold in a relevant context.",
+      "Aligned on pace, risk, and how decisions get made.",
+      "Willing to do unglamorous early work.",
+    ];
+    const specific = {
+      technical: ["Strong product sense + ability to ship MVPs fast.", "Comfortable with ambiguity and iterating in public."],
+      sales: ["Has closed deals or run BD in a related ICP.", "Enjoys discovery calls and learning from rejection."],
+      design: ["Craft + systems thinking; can own onboarding and brand lightly.", "User research empathy without perfectionism."],
+      growth: ["Bias to experiments; can write or build distribution loops.", "Comfortable with messy early metrics."],
+      ops: ["Process + financial clarity; keeps the machine running.", "Calm under delivery pressure."],
+      network: ["Trusted in the industry; opens doors ethically.", "Happy to co-create intros, not just collect cards."],
+      general: ["Brings energy where you are weak.", "Shared taste for the customer problem."],
+    };
+    return [...(specific[gap] || specific.general), ...common];
+  }
+
+  function exampleArchetypes(gap) {
+    const sets = {
+      technical: [
+        { title: "Ex-startup engineer (Series A–B alum)", blurb: "Shipped product under constraints; wants ownership, not just tickets.", where: "Alumni Slack, local founder meetups, GitHub / open-source communities (search publicly)." },
+        { title: "Agency / freelance full-stack who wants equity upside", blurb: "Tired of client work; already built similar tools for others.", where: "Indie hacker communities, freelance networks, university builder clubs." },
+        { title: "Technical PM who still codes on weekends", blurb: "Bridges product and eng; strong at scoping thin MVPs.", where: "Product communities, former colleagues, conference Slack channels." },
+      ],
+      sales: [
+        { title: "AE / founder-led sales from a B2B tool in your space", blurb: "Knows the buying committee; hungry to own a book of business.", where: "Industry Slack groups, former coworkers, sales communities." },
+        { title: "Partnerships / BD lead from an adjacent marketplace", blurb: "Great at warm intros and structuring early deals.", where: "Partner events, LinkedIn (warm intros only), operator circles." },
+        { title: "Ex-founder who sold services into your ICP", blurb: "Already has trust and stories; can open doors fast.", where: "Failed/graduated startup communities, angel syndicates as operators." },
+      ],
+      design: [
+        { title: "Product designer from a consumer or PLG SaaS", blurb: "Owns flows end-to-end; ships without waiting for perfect briefs.", where: "Design Twitter/communities, Dribbble/Behance portfolios (public), local design nights." },
+        { title: "Brand + product generalist from an early startup", blurb: "Comfortable wearing many hats; cares about clarity.", where: "Startup design Discords, alumni networks." },
+        { title: "UX researcher who can also prototype", blurb: "Turns interviews into sharp flows quickly.", where: "Research communities, university HCI programs, former teammates." },
+      ],
+      growth: [
+        { title: "Content-led growth marketer", blurb: "Can build an owned audience that compounds.", where: "Newsletter operators, creator communities, indie SEO circles." },
+        { title: "Community / partnership growth lead", blurb: "Activates networks and co-marketing without huge spend.", where: "Community builder groups, platform partner programs." },
+        { title: "Performance generalist who still writes copy", blurb: "Tests channels fast; knows when paid is premature.", where: "Growth Slack groups, agency alumni who want a startup seat." },
+      ],
+      ops: [
+        { title: "Chief of staff / ops from a small startup", blurb: "Builds lightweight process without bureaucracy.", where: "Operator communities, EIR networks, ex-founders taking #2 roles." },
+        { title: "Finance-minded generalist (FP&A or founder ops)", blurb: "Keeps runway and unit economics honest.", where: "Startup finance Discords, fractional CFO introductions (conceptual)." },
+        { title: "Delivery lead from services who wants product", blurb: "Makes promises match reality for customers.", where: "Agency alumni, client-services Slack groups." },
+      ],
+      network: [
+        { title: "Domain expert operator in your industry", blurb: "Respected voice; can validate and introduce buyers.", where: "Industry associations, conferences, alumni of category leaders." },
+        { title: "Ex-corporate innovator spinning out", blurb: "Knows how enterprises buy; still hungry.", where: "Corporate innovation alumni, industry meetups." },
+        { title: "Angel / advisor who actually operates", blurb: "Opens doors and holds you to milestones.", where: "Warm intros from mutual founders — never cold-spam." },
+      ],
+      general: [
+        { title: "Complementary co-founder from a prior collab", blurb: "You've already seen how you work under stress.", where: "Past teammates, hackathon partners, trusted peer intros." },
+        { title: "Operator seeking first founding role", blurb: "High agency; ready to own a whole function.", where: "Talent networks, startup job Discords (for co-founder channels)." },
+        { title: "Domain specialist + builder hybrid", blurb: "Understands the customer and can ship enough to learn.", where: "Niche communities around your problem space." },
+      ],
+    };
+    return sets[gap] || sets.general;
+  }
+
+  function outreachScript(gap) {
+    const name = deriveName();
+    return `Hi {{Name}} — I'm building ${name}: ${oneLiner().slice(0, 120)}…
+
+I'm especially looking for someone strong on ${firstGap()}. Your background in {{their thing}} stood out.
+
+Would you be open to a 20-minute chat next week? No pitch deck pressure — I'd love your take on the wedge and whether a collab (or intro) makes sense.
+
+Happy to work around your calendar.
+
+— {{You}}`;
+  }
+
+  function buildPlainSummary() {
+    return [
+      "COMPANY MAKER SUMMARY",
+      "=====================",
+      `Kind: ${state.kindLabel}`,
+      `Stage: ${state.stageLabel}`,
+      `Strengths: ${state.strengths}`,
+      `Gaps: ${state.gaps}`,
+      `Raise (conceptual): ${state.raise}`,
+      "",
+      "Brief one-liner:",
+      oneLiner(),
+      "",
+      "This week:",
+      ...thisWeekActions().map((a, i) => `${i + 1}. ${a}`),
+      "",
+      "Generated by Company Maker (client-side).",
+    ].join("\n");
+  }
+
+  // —— Landing ——
+  el.startBtn.addEventListener("click", startChat);
+  el.howBtn.addEventListener("click", async () => {
+    el.landing.classList.add("hidden");
+    el.chatShell.classList.add("active");
+    el.messages.innerHTML = "";
+    clearComposer();
+    setProgress(0);
+    await addBot(
+      "<strong>How Company Maker works</strong><br><br>" +
+      "1. <strong>Intake</strong> — a few questions on company kind, stage, strengths, and gaps.<br>" +
+      "2. <strong>Company Brief</strong> — a clear one-pager thesis you can share.<br>" +
+      "3. <strong>Roadmap</strong> — multi-phase plan plus concrete this-week actions.<br>" +
+      "4. <strong>Co-founder matching</strong> — ideal profiles, example archetypes, and an outreach script.<br><br>" +
+      "Everything runs in your browser. Raise goals are conceptual only — no payments or commissions.",
+      400
+    );
+    const go = document.createElement("button");
+    go.type = "button";
+    go.className = "choice";
+    go.textContent = "Start intake →";
+    go.addEventListener("click", () => startChat());
+    el.choices.appendChild(go);
+  });
+
+  el.restartBtn.addEventListener("click", () => {
+    if (confirm("Start over? Your current answers will be cleared.")) startChat();
+  });
+})();
+  </script>
+</body>
+</html>
