@@ -549,6 +549,135 @@
 
     .landing footer.site-foot { padding-top: 48px; }
 
+
+    /* —— Voice —— */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .speak-toggle {
+      appearance: none;
+      background: var(--accent-soft);
+      border: 1px solid var(--border-strong);
+      color: var(--accent-hot);
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .speak-toggle[aria-pressed="false"] {
+      background: transparent;
+      color: var(--text-dim);
+      border-color: var(--border);
+    }
+
+    .speak-toggle:hover { border-color: var(--accent); }
+
+    .speak-toggle .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 6px var(--accent-glow);
+    }
+
+    .speak-toggle[aria-pressed="false"] .dot {
+      background: var(--text-dim);
+      box-shadow: none;
+    }
+
+    .mic-btn {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-card);
+      color: var(--accent-hot);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+    }
+
+    .mic-btn svg { width: 20px; height: 20px; }
+
+    .mic-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .mic-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .mic-btn.listening {
+      background: rgba(220, 80, 70, 0.22);
+      border-color: #e07060;
+      color: #ffb4a8;
+      animation: micPulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes micPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(224, 112, 96, 0.45); }
+      50% { box-shadow: 0 0 0 8px rgba(224, 112, 96, 0); }
+    }
+
+    .mic-tip {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    .msg.bot .bubble-wrap {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .msg.bot .bubble-wrap .bubble { flex: 1; min-width: 0; }
+
+    .respeak-btn {
+      appearance: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text-dim);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      margin-top: 8px;
+      opacity: 0.7;
+      transition: opacity 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .respeak-btn:hover {
+      opacity: 1;
+      color: var(--accent-hot);
+      border-color: var(--accent);
+    }
+
+    .respeak-btn svg { width: 14px; height: 14px; }
+
+    @media (max-width: 480px) {
+      .speak-toggle .speak-label { display: none; }
+    }
+
     @media (max-width: 480px) {
       .progress-wrap { display: none; }
       .msg { max-width: 96%; }
@@ -586,12 +715,19 @@
             <span>Ideal profiles, example archetypes, and outreach scripts.</span>
           </div>
         </div>
+        <div class="feature">
+          <div class="feature-icon">🎙️</div>
+          <div>
+            <strong>Talk or type</strong>
+            <span>Mic + spoken replies via your browser (Web Speech API).</span>
+          </div>
+        </div>
       </div>
       <div class="cta-row">
         <button class="btn btn-primary" id="startBtn" type="button">Start building →</button>
         <button class="btn btn-ghost" id="howBtn" type="button">How it works</button>
       </div>
-      <p class="fine-print">Runs entirely in your browser. Nothing is uploaded. Raise goals and financial rails are conceptual only.</p>
+      <p class="fine-print">Runs entirely in your browser. Nothing is uploaded. Raise goals and financial rails are conceptual only. Talk or type — mic + spoken replies via your browser.</p>
       <footer class="site-foot">Company Maker · Made for founders who ship</footer>
     </section>
 
@@ -606,17 +742,27 @@
           <div class="progress-label" id="progressLabel">Step 1 of 5</div>
           <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
         </div>
-        <button class="restart-btn" id="restartBtn" type="button" title="Start over">Restart</button>
+        <div class="header-actions">
+          <button class="speak-toggle" id="speakToggle" type="button" aria-pressed="true" title="Toggle spoken replies">
+            <span class="dot" aria-hidden="true"></span>
+            <span class="speak-label">Speak replies</span>
+          </button>
+          <button class="restart-btn" id="restartBtn" type="button" title="Start over">Restart</button>
+        </div>
       </header>
       <div class="messages" id="messages" role="log" aria-live="polite"></div>
       <div class="composer" id="composer">
         <div class="choices" id="choices"></div>
         <div class="input-row">
           <textarea class="text-input" id="textInput" rows="1" placeholder="Type your answer…" disabled></textarea>
+          <button class="mic-btn" id="micBtn" type="button" aria-label="Voice input" title="Voice input" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </button>
           <button class="send-btn" id="sendBtn" type="button" disabled aria-label="Send">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
           </button>
         </div>
+        <p class="mic-tip" id="micTip" hidden>Voice input needs Chrome, Edge, or Safari with mic permission.</p>
         <button class="skip-link" id="skipBtn" type="button" hidden>Skip this one</button>
       </div>
     </section>
@@ -691,6 +837,9 @@
     textInput: document.getElementById("textInput"),
     sendBtn: document.getElementById("sendBtn"),
     skipBtn: document.getElementById("skipBtn"),
+    micBtn: document.getElementById("micBtn"),
+    micTip: document.getElementById("micTip"),
+    speakToggle: document.getElementById("speakToggle"),
     progressFill: document.getElementById("progressFill"),
     progressLabel: document.getElementById("progressLabel"),
     startBtn: document.getElementById("startBtn"),
@@ -714,8 +863,122 @@
     });
   }
 
+  // —— Voice (Web Speech API) ——
+  const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const speechSupported = !!SpeechRecognitionCtor;
+  const ttsSupported = typeof window.speechSynthesis !== "undefined" && typeof window.SpeechSynthesisUtterance !== "undefined";
+
+  let speakEnabled = true; // ON after Start; muted via header toggle
+  let recognition = null;
+  let listening = false;
+  let baseTranscript = "";
+
+  function cancelSpeech() {
+    if (ttsSupported) {
+      try { window.speechSynthesis.cancel(); } catch (e) { /* ignore */ }
+    }
+  }
+
+  function htmlToPlain(html) {
+    const tmp = document.createElement("div");
+    tmp.innerHTML = html;
+    tmp.querySelectorAll("script, style").forEach((n) => n.remove());
+    let text = tmp.textContent || tmp.innerText || "";
+    text = text.replace(/\u00a0/g, " ");
+    text = text.replace(/[ \t]+/g, " ");
+    text = text.replace(/\n{3,}/g, "\n\n");
+    return text.trim();
+  }
+
+  function speakText(text) {
+    if (!ttsSupported || !speakEnabled) return;
+    const plain = String(text || "").trim();
+    if (!plain) return;
+    cancelSpeech();
+    const u = new SpeechSynthesisUtterance(plain);
+    u.rate = 1;
+    u.pitch = 1;
+    try { window.speechSynthesis.speak(u); } catch (e) { /* ignore */ }
+  }
+
+  function updateSpeakToggle() {
+    if (!el.speakToggle) return;
+    el.speakToggle.setAttribute("aria-pressed", speakEnabled ? "true" : "false");
+    el.speakToggle.title = speakEnabled ? "Mute spoken replies" : "Speak replies";
+    const label = el.speakToggle.querySelector(".speak-label");
+    if (label) label.textContent = speakEnabled ? "Speak replies" : "Muted";
+  }
+
+  function setListeningUI(on) {
+    listening = !!on;
+    if (!el.micBtn) return;
+    el.micBtn.classList.toggle("listening", listening);
+    el.micBtn.setAttribute("aria-pressed", listening ? "true" : "false");
+    el.micBtn.title = listening ? "Stop listening" : "Voice input";
+  }
+
+  function stopListening() {
+    if (recognition && listening) {
+      try { recognition.stop(); } catch (e) { /* ignore */ }
+    }
+    setListeningUI(false);
+  }
+
+  function startListening() {
+    if (!speechSupported || !el.micBtn || el.micBtn.disabled) return;
+    cancelSpeech();
+    if (listening) {
+      stopListening();
+      return;
+    }
+    if (!recognition) {
+      recognition = new SpeechRecognitionCtor();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = (navigator.language || "en-US");
+      recognition.onstart = () => setListeningUI(true);
+      recognition.onend = () => setListeningUI(false);
+      recognition.onerror = () => setListeningUI(false);
+      recognition.onresult = (event) => {
+        let interim = "";
+        let finalPart = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const r = event.results[i];
+          const t = r[0].transcript;
+          if (r.isFinal) finalPart += t;
+          else interim += t;
+        }
+        const joined = (baseTranscript + " " + finalPart + (interim ? " " + interim : "")).replace(/\s+/g, " ").trim();
+        el.textInput.value = joined;
+        el.textInput.dispatchEvent(new Event("input"));
+        if (finalPart) {
+          baseTranscript = (baseTranscript + " " + finalPart).replace(/\s+/g, " ").trim();
+        }
+      };
+    }
+    baseTranscript = el.textInput.value.trim();
+    try {
+      recognition.start();
+    } catch (e) {
+      setListeningUI(false);
+    }
+  }
+
+  function syncMicAvailability() {
+    if (!el.micBtn) return;
+    if (!speechSupported) {
+      el.micBtn.disabled = true;
+      if (el.micTip) el.micTip.hidden = false;
+      return;
+    }
+    if (el.micTip) el.micTip.hidden = true;
+    // Mic usable when text field is enabled (text / allowText / multi)
+    el.micBtn.disabled = !!el.textInput.disabled;
+  }
+
   function addBot(html, delay) {
     return new Promise((resolve) => {
+      cancelSpeech();
       const typing = document.createElement("div");
       typing.className = "msg bot";
       typing.innerHTML = '<div class="bubble typing"><span></span><span></span><span></span></div>';
@@ -725,9 +988,31 @@
         typing.remove();
         const msg = document.createElement("div");
         msg.className = "msg bot";
-        msg.innerHTML = `<div class="bubble">${html}</div>`;
+        const wrap = document.createElement("div");
+        wrap.className = "bubble-wrap";
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.innerHTML = html;
+        wrap.appendChild(bubble);
+        const plain = htmlToPlain(html);
+        if (plain && ttsSupported) {
+          const re = document.createElement("button");
+          re.type = "button";
+          re.className = "respeak-btn";
+          re.title = "Speak this message";
+          re.setAttribute("aria-label", "Speak this message");
+          re.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
+          re.addEventListener("click", () => {
+            speakEnabled = true;
+            updateSpeakToggle();
+            speakText(plain);
+          });
+          wrap.appendChild(re);
+        }
+        msg.appendChild(wrap);
         el.messages.appendChild(msg);
         scrollBottom();
+        speakText(plain);
         resolve();
       }, delay == null ? 550 : delay);
     });
@@ -750,6 +1035,7 @@
   }
 
   function clearComposer() {
+    stopListening();
     el.choices.innerHTML = "";
     el.textInput.value = "";
     el.textInput.disabled = true;
@@ -757,6 +1043,7 @@
     el.skipBtn.hidden = true;
     selectedChips = new Set();
     awaiting = null;
+    syncMicAvailability();
   }
 
   function showChoices(options, opts) {
@@ -792,6 +1079,7 @@
       el.textInput.focus();
     }
     el.skipBtn.hidden = !opts.skippable;
+    syncMicAvailability();
   }
 
   function onChoiceClick(option, btn) {
@@ -832,6 +1120,7 @@
     el.textInput.placeholder = opts.placeholder || "Type your answer…";
     el.skipBtn.hidden = !opts.skippable;
     el.textInput.focus();
+    syncMicAvailability();
   }
 
   function submitText() {
@@ -881,6 +1170,9 @@
     el.chatShell.classList.add("active");
     el.messages.innerHTML = "";
     Object.assign(state, { kind: "", kindLabel: "", stage: "", stageLabel: "", strengths: "", gaps: "", raise: "", step: 0 });
+    speakEnabled = true;
+    updateSpeakToggle();
+    cancelSpeech();
     clearComposer();
     setProgress(0);
     await addBot("Hey founder 👋 I'm <strong>Company Maker</strong>. In a few quick questions we'll draft your Company Brief, a roadmap with this-week actions, and a co-founder match plan.<br><br>No login. No fluff. Ready when you are.");
@@ -1265,6 +1557,27 @@ Happy to work around your calendar.
       "",
       "Generated by Company Maker (client-side).",
     ].join("\n");
+  }
+
+
+  // —— Voice UI wiring ——
+  updateSpeakToggle();
+  syncMicAvailability();
+  if (!speechSupported && el.micTip) el.micTip.hidden = false;
+
+  if (el.speakToggle) {
+    el.speakToggle.addEventListener("click", () => {
+      speakEnabled = !speakEnabled;
+      updateSpeakToggle();
+      if (!speakEnabled) cancelSpeech();
+    });
+  }
+
+  if (el.micBtn) {
+    el.micBtn.addEventListener("click", () => {
+      if (!speechSupported) return;
+      startListening();
+    });
   }
 
   // —— Landing ——
