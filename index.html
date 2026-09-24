@@ -931,31 +931,43 @@
       stopListening();
       return;
     }
-    if (!recognition) {
-      recognition = new SpeechRecognitionCtor();
-      recognition.continuous = false;
-      recognition.interimResults = true;
-      recognition.lang = (navigator.language || "en-US");
-      recognition.onstart = () => setListeningUI(true);
-      recognition.onend = () => setListeningUI(false);
-      recognition.onerror = () => setListeningUI(false);
-      recognition.onresult = (event) => {
-        let interim = "";
-        let finalPart = "";
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const r = event.results[i];
-          const t = r[0].transcript;
-          if (r.isFinal) finalPart += t;
-          else interim += t;
-        }
-        const joined = (baseTranscript + " " + finalPart + (interim ? " " + interim : "")).replace(/\s+/g, " ").trim();
-        el.textInput.value = joined;
-        el.textInput.dispatchEvent(new Event("input"));
-        if (finalPart) {
-          baseTranscript = (baseTranscript + " " + finalPart).replace(/\s+/g, " ").trim();
-        }
-      };
-    }
+    // Fresh instance every time — Chromium throws InvalidStateError if you
+    // reuse a recognizer after stop(), which made the mic look dead after turn 1.
+    try {
+      if (recognition) {
+        recognition.onresult = null;
+        recognition.onend = null;
+        recognition.onerror = null;
+        recognition.onstart = null;
+        try { recognition.abort(); } catch (e) { /* ignore */ }
+      }
+    } catch (e) { /* ignore */ }
+    recognition = new SpeechRecognitionCtor();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = (navigator.language || "en-US");
+    recognition.onstart = () => setListeningUI(true);
+    recognition.onend = () => setListeningUI(false);
+    recognition.onerror = () => setListeningUI(false);
+    recognition.onresult = (event) => {
+      let interim = "";
+      let finalPart = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const r = event.results[i];
+        const t = r[0].transcript;
+        if (r.isFinal) finalPart += t;
+        else interim += t;
+      }
+      const joined = (baseTranscript + " " + finalPart + (interim ? " " + interim : "")).replace(/\s+/g, " ").trim();
+      // Keep the field usable even mid-listen
+      el.textInput.disabled = false;
+      el.sendBtn.disabled = false;
+      el.textInput.value = joined;
+      el.textInput.dispatchEvent(new Event("input"));
+      if (finalPart) {
+        baseTranscript = (baseTranscript + " " + finalPart).replace(/\s+/g, " ").trim();
+      }
+    };
     baseTranscript = el.textInput.value.trim();
     try {
       recognition.start();
@@ -972,8 +984,9 @@
       return;
     }
     if (el.micTip) el.micTip.hidden = true;
-    // Mic usable when text field is enabled (text / allowText / multi)
-    el.micBtn.disabled = !!el.textInput.disabled;
+    // Mic stays available for any open question (chips and/or text), not only when
+    // the textarea is already enabled — otherwise turn 2+ felt locked after voice.
+    el.micBtn.disabled = !awaiting;
   }
 
   function addBot(html, delay) {
@@ -1069,17 +1082,18 @@
       done.addEventListener("click", () => submitMulti());
       el.choices.appendChild(done);
     }
-    el.textInput.disabled = !opts.allowText && !opts.multi;
-    if (opts.allowText || opts.multi) {
-      el.textInput.disabled = false;
-      el.textInput.placeholder = opts.multi
-        ? "Or type extras, then Continue…"
-        : "Or type your own…";
-      el.sendBtn.disabled = false;
-      el.textInput.focus();
-    }
+    // Always leave text+send open so voice/type work every turn (chips remain shortcuts).
+    const allowType = true;
+    el.textInput.disabled = false;
+    el.textInput.placeholder = opts.multi
+      ? "Or type extras, then Continue…"
+      : (opts.allowText || allowType)
+        ? "Or type / speak your own…"
+        : "Type your answer…";
+    el.sendBtn.disabled = false;
     el.skipBtn.hidden = !opts.skippable;
     syncMicAvailability();
+    try { el.textInput.focus(); } catch (e) { /* ignore */ }
   }
 
   function onChoiceClick(option, btn) {
@@ -1096,7 +1110,7 @@
     }
     clearComposer();
     addUser(option.label);
-    handleAnswer(option);
+    void handleAnswer(option);
   }
 
   function submitMulti() {
@@ -1108,7 +1122,7 @@
     const text = parts.join(", ");
     clearComposer();
     addUser(text);
-    handleAnswer({ id: "multi", label: text, value: text });
+    void handleAnswer({ id: "multi", label: text, value: text });
   }
 
   function showTextOnly(opts) {
@@ -1131,17 +1145,17 @@
       submitMulti();
       return;
     }
-    if (awaiting.type === "choice" && awaiting.allowText && text) {
+    if (awaiting.type === "choice" && text) {
       clearComposer();
       addUser(text);
-      handleAnswer({ id: "custom", label: text });
+      void handleAnswer({ id: "custom", label: text });
       return;
     }
     if (awaiting.type === "text") {
       const t = text || "(skipped)";
       clearComposer();
       addUser(text ? text : "Skipped");
-      handleAnswer({ id: "text", label: text ? text : "", value: text });
+      void handleAnswer({ id: "text", label: text ? text : "", value: text });
     }
   }
 
@@ -1161,7 +1175,7 @@
     if (!awaiting || !awaiting.skippable) return;
     clearComposer();
     addUser("Skipped");
-    handleAnswer({ id: "skip", label: "", value: "" });
+    void handleAnswer({ id: "skip", label: "", value: "" });
   });
 
   // —— Flow ——
@@ -1188,7 +1202,7 @@
   async function askStage() {
     setProgress(1);
     await addBot("Where are you <strong>right now</strong>?");
-    showChoices(STAGE_OPTIONS);
+    showChoices(STAGE_OPTIONS, { allowText: true });
   }
 
   async function askStrengths() {
@@ -1206,28 +1220,28 @@
   async function askRaise() {
     setProgress(4);
     await addBot("Optional — any <strong>raise goal</strong> in mind? (Conceptual only — we don't handle money or commissions.)");
-    showChoices(RAISE_OPTIONS, { skippable: true });
+    showChoices(RAISE_OPTIONS, { allowText: true, skippable: true });
   }
 
-  function handleAnswer(option) {
+  async function handleAnswer(option) {
     const step = state.step;
     if (step === 0) {
       state.kind = option.id === "custom" ? "other" : option.id;
       state.kindLabel = option.label;
-      askStage();
+      await askStage();
     } else if (step === 1) {
-      state.stage = option.id;
+      state.stage = option.id === "custom" ? "other" : option.id;
       state.stageLabel = option.label;
-      askStrengths();
+      await askStrengths();
     } else if (step === 2) {
       state.strengths = option.value || option.label;
-      askGaps();
+      await askGaps();
     } else if (step === 3) {
       state.gaps = option.value || option.label;
-      askRaise();
+      await askRaise();
     } else if (step === 4) {
       state.raise = option.label || "Not specified";
-      generateAll();
+      await generateAll();
     }
   }
 
